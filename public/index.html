@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bootstrap demo</title>
+    <link rel="stylesheet" href="../main.css" />
+    <script src="./bootstrap.bundle.min.js"></script>
+  </head>
+  <style>
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+    #messages > li {
+      padding: 0.5rem 1rem;
+    }
+    #messages > li:nth-child(odd) {
+      background: #efefef;
+    }
+  </style>
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg bg-body-tertiary">
+        <div class="container-fluid">
+          <p class="navbar-brand">Chat Appli</p>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" href="/chat/totochannel">Channel Toto</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/chat/tatachannel">Channel Tata</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/chat/michouchannel"
+                  >Channel Michou</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main></main>
+    <!-- <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script> -->
+    <!-- <script src="./chat.js"></script> -->
+  </body>
+</html>
