@@ -7,6 +7,19 @@
     <link rel="stylesheet" href="./main.css" />
     <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   </head>
+  <style>
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+    #messages > li {
+      padding: 0.5rem 1rem;
+    }
+    #messages > li:nth-child(odd) {
+      background: #efefef;
+    }
+  </style>
   <body>
     <header>
       <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -69,19 +82,147 @@
         </div>
       </nav>
     </header>
-    <form
-      id="form"
-      class="input-group input-group-lg p-1 position-fixed bottom-0 left-0 right-0"
-    >
-      <input
-        type="text"
-        class="form-control"
-        aria-label="Sizing example input"
-        aria-describedby="inputGroup-sizing-lg"
-      />
-      <button class="input-group-text" id="input" autocomplete="off">
-        Send
-      </button>
-    </form>
+    <main>
+      <ul id="messages"></ul>
+      <p id="typing"></p>
+      <form
+        id="form"
+        action=""
+        class="input-group input-group-lg p-1 position-fixed bottom-0 left-0 right-0"
+      >
+        <input
+          id="input"
+          type="search"
+          class="form-control"
+          aria-label="Sizing example input"
+          placeholder="Write"
+          aria-describedby="inputGroup-sizing-lg"
+          autocomplete="off"
+        />
+        <button class="input-group-text" type="button">Send</button>
+      </form>
+    </main>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // input output socket bin to localhost
+        const socket = io('http://localhost:5000/')
+
+        // define const with html element
+        const form = document.getElementById('form')
+        const input = document.getElementById('input')
+        const messages = document.getElementById('messages')
+        const typing = document.getElementById('typing')
+
+        // define variable for listen user input
+        let typingTimeout
+
+        // set true for notification
+        let isUserActive = true
+
+        form.addEventListener('submit', (e) => {
+          e.preventDefault()
+          if (input.value) {
+            socket.emit('message', input.value)
+            input.value = ''
+            clearTimeout(typingTimeout)
+            socket.emit('stopTyping')
+          }
+        })
+
+        input.addEventListener('input', () => {
+          socket.emit('typing')
+          clearTimeout(typingTimeout)
+          typingTimeout = setTimeout(() => {
+            socket.emit('stopTyping')
+          }, 3000)
+        })
+
+        socket.on('typing', (id) => {
+          typing.textContent = 'A user typing..'
+        })
+
+        socket.on('stopTyping', (id) => {
+          typing.textContent = ''
+        })
+
+        socket.on('receptMessage', (data) => {
+          const item = document.createElement('li')
+          item.classList.add('list-group-item', 'list-group-item-light')
+          item.textContent = data.msg
+          if (data.id === socket.id) {
+            item.classList.add(
+              'd-flex',
+              'flex-row-reverse',
+              'p-2',
+              'border',
+              'border-white',
+              'mb-2',
+              'bg-danger',
+              'text-white',
+              'ms-auto',
+              'rounded-start',
+              'border-end-0'
+            )
+            item.style.maxWidth = 'fit-content'
+            //item.style.color = 'blue'
+          } else {
+            item.classList.add(
+              'd-flex',
+              'flex-row',
+              'p-2',
+              'border',
+              'border-white',
+              'mb-2',
+              'bg-primary',
+              'text-white',
+              'me-auto',
+              'rounded-end',
+              'border-start-0'
+            )
+            // timer define for notification
+            setTimeout(() => {
+              if (!isUserActive) {
+                notifyMe(item.textContent)
+              }
+            }, 5000)
+            item.style.maxWidth = 'fit-content'
+          }
+
+          messages.appendChild(item)
+          window.scrollTo(0, document.body.scrollHeight)
+        })
+
+        // function to send notification with the current message
+        function notifyMe(msg) {
+          if (!('Notification' in window)) {
+            console.log('This browser does not support dekstop notification')
+          } else if (Notification.permission === 'granted') {
+            new Notification(msg)
+          } else if (Notification.permission !== 'denied') {
+            Notification.requestPermission().then((permission) => {
+              if (permission === 'granted') {
+                new Notification(msg)
+              }
+            })
+          }
+        }
+
+        // Listen if user is on the web page or not
+        document.addEventListener('visibilitychange', function () {
+          isUserActive = !document.hidden
+          console.log(
+            isUserActive ? 'User is on the page' : 'User is not on the page'
+          )
+        })
+
+        if (
+          Notification.permission !== 'granted' &&
+          Notification.permission !== 'denied'
+        ) {
+          Notification.requestPermission()
+        }
+      })
+    </script>
   </body>
 </html>
