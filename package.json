@@ -1,0 +1,26 @@
+{
+  "name": "dsp-dev-socket",
+  "version": "1.0.0",
+  "description": "Socket app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alexandre2383/dsp-dev-socket.git"
+  },
+  "keywords": [
+    "socket-app"
+  ],
+  "author": "Alex",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Alexandre2383/dsp-dev-socket/issues"
+  },
+  "homepage": "https://github.com/Alexandre2383/dsp-dev-socket#readme",
+  "dependencies": {
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  }
+}
