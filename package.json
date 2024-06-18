@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/Alexandre2383/dsp-dev-socket#readme",
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "express": "^4.19.2",
     "socket.io": "^4.7.5"
   }
