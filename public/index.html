@@ -8,6 +8,29 @@
     <script src="./bootstrap.bundle.min.js"></script>
   </head>
   <style>
+    /* The Modal (background) */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      padding-top: 100px; /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgb(0, 0, 0); /* Fallback color */
+      background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
     #messages {
       list-style-type: none;
       margin: 0;
@@ -43,8 +66,82 @@
         </div>
       </nav>
     </header>
-    <main></main>
-    <!-- <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script> -->
-    <!-- <script src="./chat.js"></script> -->
+    <main>
+      <h1>Select your Channel bébé</h1>
+      <section>
+        <div id="myModal" class="modal">
+          <!-- Modal content -->
+          <div class="modal-content">
+            <form action="" id="form">
+              <input type="text" id="pseudo" placeholder="Choose your pseudo" />
+              <button>OK</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const socket = io('http://localhost:5000')
+
+        // get the pseudo set to cookie
+        const pseudo = getCookie('pseudo')
+        if (pseudo) {
+          socket.emit('setPseudo', pseudo) // send pseudo to server
+        } else {
+          displayModal() // display the modal if user hasn't a pseudo
+        }
+
+        const form = document.getElementById('form')
+        const input = document.getElementById('pseudo')
+
+        form.addEventListener('submit', function (e) {
+          e.preventDefault()
+          const newPseudo = input.value.trim()
+          if (newPseudo == 'Allan' || newPseudo == 'allan') {
+            alert("You can't take that name you dumb")
+          } else if (newPseudo) {
+            setCookie('pseudo', newPseudo, 1)
+            socket.emit('setPseudo', newPseudo) // send to server the pseudo
+            closeModal() // and close the modal
+          } else {
+            alert('Please enter a valid pseudo.')
+          }
+        })
+
+        function displayModal() {
+          const modal = document.getElementById('myModal')
+          modal.style.display = 'block'
+        }
+
+        function closeModal() {
+          const modal = document.getElementById('myModal')
+          modal.style.display = 'none'
+        }
+
+        function getCookie(cname) {
+          let name = cname + '='
+          let ca = document.cookie.split(';')
+          for (let i = 0; i < ca.length; i++) {
+            let c = ca[i]
+            while (c.charAt(0) == ' ') {
+              c = c.substring(1)
+            }
+            if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length)
+            }
+          }
+          return ''
+        }
+
+        function setCookie(cname, cvalue, exdays) {
+          const d = new Date()
+          d.setTime(d.getTime() + exdays * 24 * 60 * 60 * 1000)
+          let expires = 'expires=' + d.toUTCString()
+          document.cookie = cname + '=' + cvalue + ';' + expires + ';path=/'
+        }
+      })
+    </script>
   </body>
 </html>

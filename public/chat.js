@@ -1,23 +1,41 @@
 document.addEventListener('DOMContentLoaded', function () {
   // input output socket bin to localhost
   const socket = io('http://localhost:5000/')
+  const pseudo = getCookie('pseudo')
+  //   console.log(socket.id)
   // get the channel path
   const channel = window.location.pathname.split('/').pop()
   console.log(channel)
-  // join channel
-  socket.emit('joinChannel', channel)
-
+  // join channelUser ${pseudo} joined channel: ${channel}
+  // socket.emit('joinChannel', channel)
+  socket.emit('joinChannel', { channel, pseudo })
+  console.log(`User ${pseudo} joined channel: ${channel}`)
   // define const with html element
   const form = document.getElementById('form')
   const input = document.getElementById('input')
   const messages = document.getElementById('messages')
   const typing = document.getElementById('typing')
-
+  //   const author = document.getElementById('author')
   // define variable for listen user input
   let typingTimeout
 
   // set true for notification
   let isUserActive = true
+
+  function getCookie(cname) {
+    let name = cname + '='
+    let ca = document.cookie.split(';')
+    for (let i = 0; i < ca.length; i++) {
+      let c = ca[i]
+      while (c.charAt(0) == ' ') {
+        c = c.substring(1)
+      }
+      if (c.indexOf(name) == 0) {
+        return c.substring(name.length, c.length)
+      }
+    }
+    return ''
+  }
 
   form.addEventListener('submit', (e) => {
     e.preventDefault()
@@ -37,18 +55,21 @@ document.addEventListener('DOMContentLoaded', function () {
     }, 3000)
   })
 
-  socket.on('typing', (id) => {
+  socket.on('typing', () => {
     typing.textContent = 'A user typing..'
   })
 
-  socket.on('stopTyping', (id) => {
+  socket.on('stopTyping', () => {
     typing.textContent = ''
   })
 
   socket.on('receptMessage', (data) => {
+    console.log(data.pseudo)
     const item = document.createElement('li')
+    const name = document.createElement('p')
     item.classList.add('list-group-item', 'list-group-item-light')
     item.textContent = data.msg
+    name.textContent = data.pseudo
     if (data.id === socket.id) {
       item.classList.add(
         'd-flex',
@@ -64,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'border-end-0'
       )
       item.style.maxWidth = 'fit-content'
+      name.classList.add('text-end')
       //item.style.color = 'blue'
     } else {
       item.classList.add(
@@ -86,9 +108,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }, 5000)
       item.style.maxWidth = 'fit-content'
+      name.classList.add('text-start')
     }
 
     messages.appendChild(item)
+    messages.appendChild(name)
     window.scrollTo(0, document.body.scrollHeight)
   })
 
